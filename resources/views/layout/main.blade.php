@@ -1,5 +1,5 @@
 @section('main')
-<main>
+<main class="text-center">
   @yield('contents')
 </main>
 @endsection

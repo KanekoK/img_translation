@@ -1,5 +1,5 @@
 @section('footer')
-<footer>
+<footer class="text-center">
   <div class="copyright">
     ATSUMARU.INC
   </div>
