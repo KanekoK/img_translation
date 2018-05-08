@@ -22,3 +22,5 @@ $router->get('/', function () use ($router) {
 $router->post('/confirm', function () use ($router) {
     return view("confirm", ['from_lang' => 'aaaa']);
 });
+
+$router->get('/test', 'Lists\Controller@index');
