@@ -25,7 +25,8 @@
     </div>
   </div>
 </div>
-
+{{ $from_lang }}
+{{ $to_lang }}
 @endsection
 @include('layout.main')
 

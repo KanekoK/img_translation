@@ -11,6 +11,8 @@
 |
 */
 
+use Illuminate\Http\Request;
+
 // $router->get('/', function () use ($router) {
 //     return $router->app->version();
 // });
@@ -19,8 +21,13 @@ $router->get('/', function () use ($router) {
     return view("index");
 });
 
-$router->post('/confirm', function () use ($router) {
-    return view("confirm", ['from_lang' => 'aaaa']);
-});
+$router->post('/confirm', 'Ocr@post_check');
+
+// $router->post('/confirm', function (Request $request) use ($router) {
+//     $from_lang = $request->input('from_lang');
+//     $to_lang = $request->input('to_lang');
+//     $post = compact('from_lang', 'to_lang');
+//     return view("confirm", $post);
+// });
 
 $router->get('/test', 'Lists\Controller@index');

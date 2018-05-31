@@ -11,7 +11,7 @@ class Controller extends BaseController
     *
     *
     */
-    public function index() {
-        echo "hello";
+    public function test() {
+        return "test";
     }
 }
