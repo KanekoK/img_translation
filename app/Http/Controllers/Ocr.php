@@ -20,7 +20,7 @@ class Ocr extends BaseController
 
     public function setting_api($api_key) {
         // 画像のパス
-        $image_path = "./image.jpg";
+        $image_path = "./test.png";
         // リクエスト用のJSONを作成
         $json = json_encode( array(
             "requests" => array(
@@ -46,7 +46,7 @@ class Ocr extends BaseController
         curl_setopt( $curl, CURLOPT_HTTPHEADER, array( "Content-Type: application/json" ) ) ;
         curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false ) ;
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true ) ;
-        if( isset($referer) && !empty($referer) ) curl_setopt( $curl, CURLOPT_REFERER, $referer ) ;
+        if ( isset($referer) && !empty($referer) ) curl_setopt( $curl, CURLOPT_REFERER, $referer ) ;
         curl_setopt( $curl, CURLOPT_TIMEOUT, 15 ) ;
         curl_setopt( $curl, CURLOPT_POSTFIELDS, $json ) ;
         $res1 = curl_exec( $curl ) ;
@@ -63,5 +63,13 @@ class Ocr extends BaseController
 
         echo "<h2>ヘッダー</h2>" ;
         echo $header ;
+    }
+
+    public function test() {
+        return Config::get('appkey.vision_key');
+    }
+
+    public function main() {
+        test();
     }
 }
