@@ -16,15 +16,13 @@ class Ocr extends BaseController
     }
 
     public function post_check(Request $request) {
-        $from_lang = $request->input('from_lang');
-        $to_lang = $request->input('to_lang');
-        $post = compact('from_lang', 'to_lang');
-        return $post;
+        $input = $request->all();
+        return $input;
     }
 
     private function img2txt() {
         // 画像のパス
-        $image_path = "./img/test.png";
+        $image_path = "./uploads/test.png";
         // リクエスト用のJSONを作成
         $json = json_encode( array(
             "requests" => array(
@@ -64,29 +62,28 @@ class Ocr extends BaseController
     }
 
     private function zh2ja($target_txt) {
-        $url = "https://vision.googleapis.com/v1/images:annotate?key=";
+        $url = "https://translation.googleapis.com/language/translate/v2?key=";
         $api_url  = $url . $this->gcp_key;
-        $formated_url = $api_url . "&q=" . $target_txt . "&source=zh&target=ja";
-
+        $formated_url = $api_url . "&q=" . urlencode($target_txt) . "&source=zh&target=ja";
         // リクエストを実行
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $formated_url);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        // curl_setopt( $curl, CURLOPT_POSTFIELDS, $json);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         $res = curl_exec($curl);
         curl_close($curl);
 
         // 取得したデータ
         $data = json_decode($res, true);
-        var_dump($res);
         return $data["data"]["translations"][0]["translatedText"];
     }
 
     public function main() {
         $china_txt = $this->img2txt();
-        $this->zh2ja($china_txt);
+        return $this->zh2ja($china_txt);
+    }
+
+    public function test() {
+        echo "test";
     }
 }
