@@ -16,8 +16,11 @@ class Ocr extends BaseController
     }
 
     public function post_check(Request $request) {
-        $input = $request->all();
-        return $input;
+        $from_lang = $request->input('from_lang');
+        $to_lang = $request->input('to_lang');
+        $file = $request->file('img_file');
+        $post = compact('from_lang', 'to_lang', 'img_file');
+        return $post;
     }
 
     private function img2txt() {
