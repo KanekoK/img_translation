@@ -7,7 +7,7 @@
 
 @section('contents')
   <div class="file_upload">
-    <form action="confirm" method="post">
+    <form action="confirm" method="post" enctype="multipart/form-data">
       <input type="file" name="img_file" id="img_file" class="mx-auto">
       <p>FROM：
         <select name="from_lang" id="from_lang">
