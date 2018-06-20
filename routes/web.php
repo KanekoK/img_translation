@@ -21,7 +21,7 @@ $router->get('/', function () use ($router) {
     return view("index");
 });
 
-$router->post('/confirm', 'Ocr@main');
+$router->post('/confirm', 'Ocr@test');
 
 // $router->post('/confirm', function (Request $request) use ($router) {
 //     $from_lang = $request->input('from_lang');

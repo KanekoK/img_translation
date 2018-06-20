@@ -66,10 +66,11 @@ class Ocr extends BaseController
     }
 
     public function test() {
-        return Config::get('appkey.vision_key');
+        return config('appkey.vision_key');
+        // return "test";
     }
 
     public function main() {
-        test();
+        return test();
     }
 }
