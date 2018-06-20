@@ -11,16 +11,21 @@ class Ocr extends BaseController
     * 
     *
     */
+    public function __construct() {
+        $this->gcp_key = env('GCP_KEY');
+    }
+
     public function post_check(Request $request) {
         $from_lang = $request->input('from_lang');
         $to_lang = $request->input('to_lang');
-        $post = compact('from_lang', 'to_lang');
+        $file = $request->file('img_file');
+        $post = compact('from_lang', 'to_lang', 'img_file');
         return $post;
     }
 
-    public function setting_api($api_key) {
+    private function img2txt() {
         // 画像のパス
-        $image_path = "./test.png";
+        $image_path = "./uploads/test.png";
         // リクエスト用のJSONを作成
         $json = json_encode( array(
             "requests" => array(
@@ -30,8 +35,8 @@ class Ocr extends BaseController
                     ) ,
                     "features" => array(
                         array(
-                            "type" => "TEXT_DETECTION" ,
-                            "maxResults" => 3 ,
+                            "type" => "TEXT_DETECTION",
+                            "maxResults" => 10,
                         ) ,
                     ) ,
                 ) ,
@@ -39,38 +44,49 @@ class Ocr extends BaseController
         ) ) ;
 
         // リクエストを実行
-        $curl = curl_init() ;
-        curl_setopt( $curl, CURLOPT_URL, "https://vision.googleapis.com/v1/images:annotate?key=" . $api_key ) ;
-        curl_setopt( $curl, CURLOPT_HEADER, true ) ; 
-        curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, "POST" ) ;
-        curl_setopt( $curl, CURLOPT_HTTPHEADER, array( "Content-Type: application/json" ) ) ;
-        curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false ) ;
-        curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true ) ;
-        if ( isset($referer) && !empty($referer) ) curl_setopt( $curl, CURLOPT_REFERER, $referer ) ;
-        curl_setopt( $curl, CURLOPT_TIMEOUT, 15 ) ;
-        curl_setopt( $curl, CURLOPT_POSTFIELDS, $json ) ;
-        $res1 = curl_exec( $curl ) ;
-        $res2 = curl_getinfo( $curl ) ;
-        curl_close( $curl ) ;
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, "https://vision.googleapis.com/v1/images:annotate?key=" . $this->gcp_key);
+        // curl_setopt($curl, CURLOPT_HEADER, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        if ( isset($referer) && !empty($referer)) {
+            curl_setopt($curl, CURLOPT_REFERER, $referer);
+        }
+        curl_setopt( $curl, CURLOPT_TIMEOUT, 15);
+        curl_setopt( $curl, CURLOPT_POSTFIELDS, $json);
+        $res = curl_exec($curl);
+        curl_close($curl);
 
         // 取得したデータ
-        $json = substr( $res1, $res2["header_size"] ) ;             // 取得したJSON
-        $header = substr( $res1, 0, $res2["header_size"] ) ;        // レスポンスヘッダー
+        $data = json_decode($res, true);
+        return $data["responses"][0]["fullTextAnnotation"]["text"];
+    }
 
-        // 出力
-        echo "<h2>JSON</h2>" ;
-        echo $json ;
+    private function zh2ja($target_txt) {
+        $url = "https://translation.googleapis.com/language/translate/v2?key=";
+        $api_url  = $url . $this->gcp_key;
+        $formated_url = $api_url . "&q=" . urlencode($target_txt) . "&source=zh&target=ja";
+        // リクエストを実行
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $formated_url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        $res = curl_exec($curl);
+        curl_close($curl);
 
-        echo "<h2>ヘッダー</h2>" ;
-        echo $header ;
+        // 取得したデータ
+        $data = json_decode($res, true);
+        return $data["data"]["translations"][0]["translatedText"];
+    }
+    
+    public function main() {
+        $china_txt = $this->img2txt();
+        return $this->zh2ja($china_txt);
     }
 
     public function test() {
-        return config('appkey.vision_key');
-        // return "test";
-    }
-
-    public function main() {
-        return test();
+        echo "test";
     }
 }

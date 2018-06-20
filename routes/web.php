@@ -30,4 +30,4 @@ $router->post('/confirm', 'Ocr@test');
 //     return view("confirm", $post);
 // });
 
-$router->get('/test', 'Lists\Controller@index');
+$router->get('/test', 'Ocr@test');
